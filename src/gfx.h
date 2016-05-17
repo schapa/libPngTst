@@ -31,13 +31,20 @@ typedef struct {
 typedef struct {
 	shape_t shape;
 	const char *text;
+	uint8_t textSize;
 } textWidget_t, *textWidget_p;
+
+void Surface_Init(uint16_t width, uint16_t heigth);
 
 gfxSurface_p Surface_New(uint16_t width, uint16_t heigth);
 void Surface_Delete(gfxSurface_p surface);
 
 void Surface_SetGenericSurface(gfxSurface_p srf);
 gfxSurface_p Surface_GetGenericSurface(void);
+
+void Surface_Fill(gfxSurface_p srf, uint8_t val);
+
+void Surface_BlendLayers(gfxSurface_p *layers, uint8_t count);
 
 
 #endif /* GFX_H_ */
