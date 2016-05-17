@@ -15,4 +15,6 @@
 void Testing_shotSurface (gfxSurface_p srf, const char *fileName);
 void Testing_dymmyFillSurface (gfxSurface_p srf);
 
+void Testing_SquareTest (void);
+
 #endif /* TESTING_H_ */

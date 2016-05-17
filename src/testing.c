@@ -38,6 +38,60 @@ void Testing_dymmyFillSurface (gfxSurface_p srf) {
 	}
 }
 
+void Testing_SquareTest (void) {
+
+    gfxSurface_p genericSurface = Surface_GetGenericSurface();
+
+	Testing_dymmyFillSurface(genericSurface);
+	Testing_shotSurface(genericSurface, "fff.png");
+
+    gfxSurface_p one = Surface_New(10, 10);
+    gfxSurface_p two = Surface_New(20, 20);
+    gfxSurface_p three = Surface_New(30, 30);
+
+    Surface_Fill(one, 0);
+    Surface_Fill(two, 7);
+    Surface_Fill(three, 15);
+
+	Testing_shotSurface(one, "1.png");
+	Testing_shotSurface(two, "2.png");
+	Testing_shotSurface(three, "3.png");
+
+    one->x = 10;
+    one->y = 10;
+    two->x = 30;
+    two->y = 15;
+    three->x = 70;
+    three->y = 20;
+
+    one->next = two;
+    two->next = three;
+
+    Surface_BlendLayers(&one, 1);
+	Testing_shotSurface(genericSurface, "aaa.png");
+
+    gfxSurface_p layers[] = { three, two, one };
+
+    one->x = 10;
+    one->y = 10;
+    two->x = 10;
+    two->y = 10;
+    three->x = 10;
+    three->y = 10;
+
+    one->next = NULL;
+    two->next = NULL;
+
+    Surface_Fill(genericSurface, 0);
+    Surface_BlendLayers(layers, 3);
+	Testing_shotSurface(genericSurface, "bbb.png");
+
+	Surface_Delete(one);
+	Surface_Delete(two);
+	Surface_Delete(three);
+    Surface_Fill(genericSurface, 0);
+}
+
 static void makeShot(uint8_t **buff, const uint32_t width, const uint32_t height, const char *fileName) {
 
     uint8_t pngBuff[height][width][4];

@@ -16,6 +16,7 @@
 
 #include "testing.h"
 
+void Render_Text(gfxSurface_p srf, const char *text);
 
 int main(void) {
     const uint32_t width = 256;
@@ -23,52 +24,35 @@ int main(void) {
 
     Surface_Init(width, height);
 
+//    Testing_SquareTest();
+
     gfxSurface_p genericSurface = Surface_GetGenericSurface();
-		Testing_dymmyFillSurface(genericSurface);
-		Testing_shotSurface(genericSurface, "fff.png");
+    Surface_Fill(genericSurface, 1);
 
-    gfxSurface_p one = Surface_New(10, 10);
-    gfxSurface_p two = Surface_New(20, 20);
-    gfxSurface_p three = Surface_New(30, 30);
+    gfxSurface_p firstLine = Surface_New(127, 19);
+    gfxSurface_p secondLine = Surface_New(127, 19);
 
-    Surface_Fill(one, 0);
-    Surface_Fill(two, 7);
-    Surface_Fill(three, 15);
+    firstLine->x = 0;
+    firstLine->y = 0;
+    secondLine->x = 0;
+    secondLine->y = firstLine->heigth;
 
-	Testing_shotSurface(one, "1");
-	Testing_shotSurface(two, "2.png");
-	Testing_shotSurface(three, "3.png");
+    firstLine->next = secondLine;
 
-    one->x = 10;
-    one->y = 10;
-    two->x = 50;
-    two->y = 10;
-    three->x = 100;
-    three->y = 10;
+    Surface_Fill(firstLine, 0);
+    Surface_Fill(secondLine, 0);
+    Render_Text(firstLine, "Oil temp 110 C");
+    Render_Text(secondLine, "Boost 15 PSI");
 
-    one->next = two;
-    two->next = three;
+    Surface_Fill(genericSurface, 1);
+    Surface_BlendLayers(&firstLine, 1);
+	Testing_shotSurface(genericSurface, "text.png");
 
-    Surface_BlendLayers(&one, 1);
-	Testing_shotSurface(genericSurface, "aaa.png");
-
-    gfxSurface_p layers[] = { three, two, one };
-
-    one->x = 10;
-    one->y = 10;
-    two->x = 10;
-    two->y = 10;
-    three->x = 10;
-    three->y = 10;
-
-    one->next = NULL;
-    two->next = NULL;
-
-    Surface_Fill(genericSurface, 0);
-    Surface_BlendLayers(layers, 3);
-	Testing_shotSurface(genericSurface, "bbb.png");
-
-    textWidget_t wdg = { { genericSurface, 15 }, "testText" };
+    Surface_Fill(firstLine, 0);
+    Render_Text(firstLine, "HELLO TESTING!");
+    Surface_Fill(genericSurface, 1);
+    Surface_BlendLayers(&firstLine, 1);
+	Testing_shotSurface(genericSurface, "text2.png");
 
 	return EXIT_SUCCESS;
 }

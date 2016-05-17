@@ -46,5 +46,7 @@ void Surface_Fill(gfxSurface_p srf, uint8_t val);
 
 void Surface_BlendLayers(gfxSurface_p *layers, uint8_t count);
 
+void Render_Text(gfxSurface_p srf, const char *text);
+
 
 #endif /* GFX_H_ */

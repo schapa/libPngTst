@@ -91,7 +91,7 @@ void Surface_BlendLayers(gfxSurface_p *layers, uint8_t count) {
 				for (y = 0; (y < surf->heigth) && (surf->y + y < s_genericSurface->heigth); y++) {
 					uint8_t *start = &s_genericSurface->line[surf->y + y][surf->x];
 					uint16_t len = surf->x + surf->width < s_genericSurface->width ? surf->width :
-							s_genericSurface->width - (surf->x + surf->width);
+							surf->x < s_genericSurface->width ? s_genericSurface->width - surf->x : 0;
 					memcpy(start, surf->line[y], len);
 				}
 				surf = surf->next;
