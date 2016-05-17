@@ -12,29 +12,23 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "png.h"
+#include "gfx.h"
 
-void makeShot(uint8_t *buff, const uint32_t width, const uint32_t height, const char *fileName);
+#include "testing.h"
+
 
 int main(void) {
-	uint8_t buff[8192];
     const uint32_t width = 256;
     const uint32_t height = 64;
 
-    int i, j;
-    for (i = 0; i < height; i++) {
-		for (j = 0; j < width; j++) {
-			float xDist = abs(height/2 - i)/(float)(height/2);
-			float yDist = abs(width/2 - j)/(float)(width/2);
-			int alpha = (int)(0x0F*xDist*yDist);
-			if (j%2) {
-				buff[i*width/2 + j/2] |= alpha<<4;
-			} else {
-				buff[i*width/2 + j/2] = alpha;
-			}
-		}
-	}
+    gfxSurface_p genericSurface = Surface_New(width, height);
+    if (genericSurface) {
+    	Surface_SetGenericSurface(genericSurface);
+			Testing_dymmyFillSurface(genericSurface);
+			Testing_shotSurface(genericSurface, "fff.png");
+    }
 
-	makeShot(buff, width, height, "fff.png");
+    textWidget_t wdg = { { genericSurface, 15 }, "testText" };
 
 	return EXIT_SUCCESS;
 }

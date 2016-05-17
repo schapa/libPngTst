@@ -9,8 +9,36 @@
 #include <stdlib.h>
 #include <stdint.h>
 #include "png.h"
+#include "testing.h"
 
-void makeShot(uint8_t *buff, const uint32_t width, const uint32_t height, const char *fileName) {
+static void makeShot(uint8_t **buff, const uint32_t width, const uint32_t height, const char *fileName);
+
+void Testing_shotSurface (gfxSurface_p srf, const char *fileName) {
+	if (srf && fileName) {
+		makeShot(srf->line, srf->width, srf->heigth, fileName);
+	}
+}
+
+void Testing_dymmyFillSurface (gfxSurface_p srf) {
+
+	if (srf && srf->line) {
+		int i, j;
+		for (i = 0; i < srf->heigth; i++) {
+			for (j = 0; j < srf->width; j++) {
+				float xDist = abs(srf->heigth/2 - i)/(float)(srf->heigth/2);
+				float yDist = abs(srf->width/2 - j)/(float)(srf->width/2);
+				int alpha = (int)(0x0F*xDist*yDist);
+				if (j%2) {
+					srf->line[i][j] |= alpha<<4;
+				} else {
+					srf->line[i][j] = alpha;
+				}
+			}
+		}
+	}
+}
+
+static void makeShot(uint8_t **buff, const uint32_t width, const uint32_t height, const char *fileName) {
 
     uint8_t pngBuff[height][width][4];
 	unsigned char *rows[height];
@@ -54,9 +82,9 @@ void makeShot(uint8_t *buff, const uint32_t width, const uint32_t height, const 
 //				int alpha = (int)(255*xDist*yDist);
 				int alpha = 0;
 				if (buffCnt %2) {
-					alpha = 255 * ((buff[buffCnt/2]>>4)/(float)0x0F);
+					alpha = 255 * ((buff[i][j]>>4)/(float)0x0F);
 				} else {
-					alpha = 255 * ((buff[buffCnt/2] & 0x0F)/(float)0x0F);
+					alpha = 255 * ((buff[i][j] & 0x0F)/(float)0x0F);
 				}
 				buffCnt++;
 				*(uint32_t*)pngBuff[i][j] = 0xFFFFFFFF;
@@ -80,6 +108,5 @@ destroy_write: // hate it
     if (fp)
         fclose(fp);
 }
-
 
 
