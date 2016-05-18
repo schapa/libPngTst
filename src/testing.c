@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "png.h"
 #include "testing.h"
+#include "fontPainter.h"
 
 static void makeShot(uint8_t **buff, const uint32_t width, const uint32_t height, const char *fileName);
 
@@ -90,6 +91,46 @@ void Testing_SquareTest (void) {
 	Surface_Delete(two);
 	Surface_Delete(three);
     Surface_Fill(genericSurface, 0);
+}
+
+void Testing_SimpleText (void) {
+    gfxSurface_p genericSurface = Surface_GetGenericSurface();
+    Surface_Fill(genericSurface, 1);
+
+    gfxSurface_p firstLine = Surface_New(127, 19);
+    gfxSurface_p secondLine = Surface_New(127, 19);
+
+    fontItem_p font = FontPainter_SizeLookup(FONT_DIGITAL_7SEGMENT, 12);
+    fontItem_p fontBig = FontPainter_SizeLookup(FONT_CENTURY_SCOOLBOOK, 12);
+
+    firstLine->x = 0;
+    firstLine->y = 0;
+    secondLine->x = 0;
+    secondLine->y = firstLine->heigth;
+
+    firstLine->next = secondLine;
+
+    Surface_Fill(firstLine, 1);
+    Surface_Fill(secondLine, 1);
+    FontPainter_RenderText(firstLine, font, "Oil temp 110 C");
+    FontPainter_RenderText(secondLine, fontBig, "10: 30");
+
+    Surface_Fill(genericSurface, 1);
+    Surface_BlendLayers(&firstLine, 1);
+	Testing_shotSurface(genericSurface, "text.png");
+
+    Surface_Fill(firstLine, 3);
+    Surface_Fill(secondLine, 3);
+    FontPainter_RenderText(firstLine, font, "The quick brown fox jumps over the lazy dog");
+    FontPainter_RenderText(secondLine, fontBig, "The quick brown ");
+    Surface_Fill(genericSurface, 1);
+    Surface_BlendLayers(&firstLine, 1);
+	Testing_shotSurface(genericSurface, "text2.png");
+
+	Surface_Delete(firstLine);
+	Surface_Delete(secondLine);
+    Surface_Fill(genericSurface, 0);
+
 }
 
 static void makeShot(uint8_t **buff, const uint32_t width, const uint32_t height, const char *fileName) {

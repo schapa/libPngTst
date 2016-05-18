@@ -2,9 +2,7 @@
 
 #include "century_schoolbook_l_bold_12_font.h"
 
-const int century_schoolbook_l_bold_12_font_TALLEST_CHAR_PIXELS = 12;
-
-const struct font_char century_schoolbook_l_bold_12_font_lookup[] = {
+static const fontLookupItem_t s_lookup[] = {
     // offset, width, height, left, top, advance
     {0, 0, 0, 0, 0},
     {0, 0, 0, 0, 0},
@@ -137,7 +135,7 @@ const struct font_char century_schoolbook_l_bold_12_font_lookup[] = {
     {0, 0, 0, 0, 0}
 };
 
-const uint8_t century_schoolbook_l_bold_12_font_pixels[] = {
+static const uint8_t s_pixels[] = {
     // width, height, left, top, advance
     //   (32)
     // ! (33)
@@ -982,5 +980,12 @@ const uint8_t century_schoolbook_l_bold_12_font_pixels[] = {
     0x09,0xae,0xec,0xa5,0x49,0xa5,0x46, //  *@*:*:
     0x1b,0xa5,0x40,0x8b,0xe0,0xd3,0x26, // .*:+%%.
     0x00
+};
+
+const fontItem_t century_schoolbook_l_bold_12_font = {
+    s_lookup,
+    s_pixels,
+    12,
+    12,
 };
 

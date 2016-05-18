@@ -28,12 +28,6 @@ typedef struct {
 	uint8_t grayscale;
 } shape_t, *shape_p;
 
-typedef struct {
-	shape_t shape;
-	const char *text;
-	uint8_t textSize;
-} textWidget_t, *textWidget_p;
-
 void Surface_Init(uint16_t width, uint16_t heigth);
 
 gfxSurface_p Surface_New(uint16_t width, uint16_t heigth);
@@ -45,8 +39,5 @@ gfxSurface_p Surface_GetGenericSurface(void);
 void Surface_Fill(gfxSurface_p srf, uint8_t val);
 
 void Surface_BlendLayers(gfxSurface_p *layers, uint8_t count);
-
-void Render_Text(gfxSurface_p srf, const char *text);
-
 
 #endif /* GFX_H_ */

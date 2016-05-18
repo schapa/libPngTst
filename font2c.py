@@ -5,9 +5,9 @@ import re
 import StringIO
 
 FONT_FILE_PATH = '/usr/share/ghostscript/9.10/Resource/Font/CenturySchL-Bold' #
-#FONT_FILE_PATH = '/usr/share/fonts/truetype/ttf-dejavu/DejaVuSerifCondensed.ttf'
-#FONT_FILE_PATH = '/usr/share/fonts/truetype/noto/NotoSerif-Italic.ttf'
-FONT_PIXEL_SIZE = 16
+#FONT_FILE_PATH = '/home/shapa/workspace_s/libpngTst/digital-7.ttf'
+#FONT_FILE_PATH = '/home/shapa/workspace_s/libpngTst/CREAMPUF.TTF'
+FONT_PIXEL_SIZE = 12
 FIRST_CHAR = ' '
 LAST_CHAR = '~'
 TAB_STR = ' ' * 4
@@ -20,38 +20,57 @@ class ClangGenerator(object):
         self.pixelSize_int = pixelSize_int
         self.face = freetype.Face(fontFile_path)
         self.face.set_pixel_sizes(0, pixelSize_int)
+        self.hc_file = open('font.h', 'w')
         self.h_file = open(self._getHeaderName(), 'w')
         self.c_file = open(self._getSourceName(), 'w')
+	self.generateCHeaderComm()
         self.generateCHeader()
         self.generateCSource()
 
     def generateCHeader(self):
         self.h_file.write('// Header (.h) for font: {}\n\n'.format(self._getFriendlyName()))
-        self.h_file.write('#include <stdint.h>\n\n'.format(self._getFriendlyName()))
-        self.h_file.write('extern const int {}_TALLEST_CHAR_PIXELS;\n\n'.format(self._getSafeName()).format(self._getHeightOfTallestCharacter()))
-        self.h_file.write('extern const uint8_t {}_pixels[];\n\n'.format(self._getSafeName()))
-        self.h_file.write('struct font_char {\n')
-        self.h_file.write('{}int offset;\n'.format(TAB_STR))
-        self.h_file.write('{}int w;\n'.format(TAB_STR))
-        self.h_file.write('{}int h;\n'.format(TAB_STR))
-        self.h_file.write('{}int left;\n'.format(TAB_STR))
-        self.h_file.write('{}int top;\n'.format(TAB_STR))
-        self.h_file.write('{}int advance;\n'.format(TAB_STR))
-        self.h_file.write('};\n\n')
-        self.h_file.write('extern const struct font_char {}_lookup[];\n'.format(self._getSafeName()))
+        self.h_file.write('#pragma once\n\n')
+        self.h_file.write('#include <stdint.h>\n')
+        self.h_file.write('#include "font.h"\n\n')
+        self.h_file.write('extern const fontItem_t {};\n\n'.format(self._getSafeName()))
+
+    def generateCHeaderComm(self):
+        self.hc_file.write('// Header (.h) for generated fonts\n\n')
+        self.hc_file.write('#pragma once\n\n')
+        self.hc_file.write('#include <stdint.h>\n')
+        self.hc_file.write('#include <stddef.h>\n\n')
+        self.hc_file.write('typedef struct {\n')
+        self.hc_file.write('{}size_t offset;\n'.format(TAB_STR))
+        self.hc_file.write('{}uint8_t width;\n'.format(TAB_STR))
+        self.hc_file.write('{}uint8_t heigth;\n'.format(TAB_STR))
+        self.hc_file.write('{}int8_t left;\n'.format(TAB_STR))
+        self.hc_file.write('{}int8_t top;\n'.format(TAB_STR))
+        self.hc_file.write('{}uint8_t advance;\n'.format(TAB_STR))
+        self.hc_file.write('} fontLookupItem_t, *fontLookupItem_p;\n\n')
+        self.hc_file.write('typedef struct {\n')
+        self.hc_file.write('{}const fontLookupItem_p lookup;\n'.format(TAB_STR))
+        self.hc_file.write('{}const uint8_t *pixelData;\n'.format(TAB_STR))
+        self.hc_file.write('{}const uint8_t tallestChar;\n'.format(TAB_STR))
+        self.hc_file.write('{}const uint8_t size;\n'.format(TAB_STR))
+        self.hc_file.write('} fontItem_t, *fontItem_p;\n\n')
 
     def generateCSource(self):
         self.c_file.write('// Source (.c) for font: {}\n\n'.format(self._getFriendlyName()))
         self.c_file.write('#include "{}"\n\n'.format(self._getHeaderName()))
-        self.c_file.write('const int {0}_TALLEST_CHAR_PIXELS = {1};\n\n'.format(self._getSafeName(), self._getHeightOfTallestCharacter()))
         self._generateLookupTable()
         self._generatePixelTable()
+        self.c_file.write('const fontItem_t {} = {{\n'.format(self._getSafeName()))
+        self.c_file.write('{}s_lookup,\n'.format(TAB_STR))
+        self.c_file.write('{}s_pixels,\n'.format(TAB_STR))
+        self.c_file.write('{}{},\n'.format(TAB_STR, self._getHeightOfTallestCharacter()))
+        self.c_file.write('{}{},\n'.format(TAB_STR, FONT_PIXEL_SIZE))
+        self.c_file.write('};\n\n')
 
     def _generateLookupTable(self):
-        self.c_file.write('const struct font_char {}_lookup[] = {{\n'.format(self._getSafeName()))
+        self.c_file.write('static const fontLookupItem_t s_lookup[] = {\n')
         self.c_file.write('{}// offset, width, height, left, top, advance\n'.format(TAB_STR))
         offset = 0
-        for j in range(128):
+        for j in range(ord(LAST_CHAR) + 1):
             if j in range(ord(FIRST_CHAR), ord(LAST_CHAR) + 1):
                 char = chr(j)
                 char_bmp, buf, w, h, left, top, advance, pitch = self._getChar(char)
@@ -67,7 +86,7 @@ class ClangGenerator(object):
                           .format(TAB_STR, offset, w, h, left, top, advance, char, ord(char)))
 
     def _generatePixelTable(self):
-        self.c_file.write('const uint8_t {}_pixels[] = {{\n'.format(self._getSafeName()))
+        self.c_file.write('static const uint8_t s_pixels[] = {{\n'.format(self._getSafeName()))
         self.c_file.write('{}// width, height, left, top, advance\n'.format(TAB_STR))
         for i in range(ord(FIRST_CHAR), ord(LAST_CHAR) + 1):
             char = chr(i)
