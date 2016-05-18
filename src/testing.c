@@ -97,8 +97,8 @@ void Testing_SimpleText (void) {
     gfxSurface_p genericSurface = Surface_GetGenericSurface();
     Surface_Fill(genericSurface, 1);
 
-    gfxSurface_p firstLine = Surface_New(127, 19);
-    gfxSurface_p secondLine = Surface_New(127, 19);
+    gfxSurface_p firstLine = Surface_New(255, 19);
+    gfxSurface_p secondLine = Surface_New(255, 19);
 
     fontItem_p font = FontPainter_SizeLookup(FONT_DIGITAL_7SEGMENT, 12);
     fontItem_p fontBig = FontPainter_SizeLookup(FONT_CENTURY_SCOOLBOOK, 12);
@@ -112,7 +112,7 @@ void Testing_SimpleText (void) {
 
     Surface_Fill(firstLine, 1);
     Surface_Fill(secondLine, 1);
-    FontPainter_RenderText(firstLine, font, "Oil temp 110 C");
+    FontPainter_RenderText(firstLine, font, "Oil temp 11.0 C");
     FontPainter_RenderText(secondLine, fontBig, "10: 30");
 
     Surface_Fill(genericSurface, 1);
@@ -122,7 +122,7 @@ void Testing_SimpleText (void) {
     Surface_Fill(firstLine, 3);
     Surface_Fill(secondLine, 3);
     FontPainter_RenderText(firstLine, font, "The quick brown fox jumps over the lazy dog");
-    FontPainter_RenderText(secondLine, fontBig, "The quick brown ");
+    FontPainter_RenderText(secondLine, fontBig, "The quick brown fox jumps over the lazy dog");
     Surface_Fill(genericSurface, 1);
     Surface_BlendLayers(&firstLine, 1);
 	Testing_shotSurface(genericSurface, "text2.png");

@@ -13,9 +13,9 @@ void FontPainter_RenderText(gfxSurface_p srf, fontItem_p font, const char *text)
 		return;
 	uint16_t xPos = 0;
 	fontLookupItem_p lookup = font->lookup;
-	uint8_t *pixel = font->pixelData;
+	const uint8_t *pixel = font->pixelData;
 	while (*text) {
-		fontLookupItem_t character = lookup[*text];
+		fontLookupItem_t character = lookup[(size_t)*text];
 	    uint16_t x, y;
 	    for (y = 0; (y < character.heigth) && (y < srf->heigth); ++y) {
 	    	for (x = 0; (x < character.width) && (x < srf->width); ++x) {
@@ -34,7 +34,7 @@ uint16_t FontPainter_GetTextWidth(fontItem_p font, const char *text) {
 		return width;
 	fontLookupItem_p lookup = font->lookup;
 	while (*text) {
-		width += lookup[*text++].advance;
+		width += lookup[(size_t)*text++].advance;
 	}
 	return width;
 }
