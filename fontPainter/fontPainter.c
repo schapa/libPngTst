@@ -27,16 +27,3 @@ void FontPainter_RenderText(gfxSurface_p srf, fontItem_p font, const char *text)
 	    text++;
 	}
 }
-
-uint16_t FontPainter_GetTextWidth(fontItem_p font, const char *text) {
-	uint16_t width = 0;
-	if (!font || !text)
-		return width;
-	fontLookupItem_p lookup = font->lookup;
-	while (*text) {
-		width += lookup[(size_t)*text++].advance;
-	}
-	return width;
-}
-
-

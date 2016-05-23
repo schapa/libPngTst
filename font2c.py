@@ -60,7 +60,7 @@ class ClangGenerator(object):
         self._generateLookupTable()
         self._generatePixelTable()
         self.c_file.write('const fontItem_t {} = {{\n'.format(self._getSafeName()))
-        self.c_file.write('{}s_lookup,\n'.format(TAB_STR))
+        self.c_file.write('{}(const fontLookupItem_p)s_lookup,\n'.format(TAB_STR))
         self.c_file.write('{}s_pixels,\n'.format(TAB_STR))
         self.c_file.write('{}{},\n'.format(TAB_STR, self._getHeightOfTallestCharacter()))
         self.c_file.write('{}{},\n'.format(TAB_STR, FONT_PIXEL_SIZE))
@@ -77,8 +77,8 @@ class ClangGenerator(object):
                 self._generateLookupEntryForChar(char, offset, w, h, left, top, advance)
                 offset += w * h
             else:
-                self.c_file.write('{}{{0, 0, 0, 0, 0}},\n'.format(TAB_STR))
-        self.c_file.write('{}{{0, 0, 0, 0, 0}}\n'.format(TAB_STR))
+                self.c_file.write('{}{{0}},\n'.format(TAB_STR))
+        self.c_file.write('{}{{0}}\n'.format(TAB_STR))
         self.c_file.write('};\n\n')
 
     def _generateLookupEntryForChar(self, char, offset, w, h, left, top, advance):

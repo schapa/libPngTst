@@ -24,7 +24,7 @@ int main(void) {
     Surface_Init(width, height);
 
 //    Testing_SquareTest();
-//    Testing_SimpleText();
+    Testing_SimpleText();
 
     textWidget_t text;
     text.shape.surface = Surface_GetGenericSurface();
@@ -33,7 +33,7 @@ int main(void) {
     text.text = "Hello my someone 1111";
 
     TextWidget_Render(&text);
-	Testing_shotSurface(Surface_GetGenericSurface(), "text.png");
+	Testing_shotSurface(Surface_GetGenericSurface(), "text3.png");
 
 	return EXIT_SUCCESS;
 }
