@@ -4,26 +4,28 @@ import freetype
 import re
 import StringIO
 
-FONT_FILE_PATH = '/usr/share/ghostscript/9.10/Resource/Font/CenturySchL-Bold' #
+FONT_FILE_PATH = '/usr/share/ghostscript/9.10/Resource/Font/CenturySchL-Bold'
+#FONT_FILE_PATH = '/home/shapa/workspace_s/libpngTst/DJB Get Digital.ttf' #
 #FONT_FILE_PATH = '/home/shapa/workspace_s/libpngTst/digital-7.ttf'
 #FONT_FILE_PATH = '/home/shapa/workspace_s/libpngTst/CREAMPUF.TTF'
-FONT_PIXEL_SIZE = 12
+FONT_PIXEL_SIZE = 24
 FIRST_CHAR = ' '
 LAST_CHAR = '~'
 TAB_STR = ' ' * 4
 
 def main():
-    ClangGenerator(FONT_FILE_PATH, FONT_PIXEL_SIZE)
+    ClangGenerator(FONT_FILE_PATH, FONT_PIXEL_SIZE, True)
 
 class ClangGenerator(object):
-    def __init__(self, fontFile_path, pixelSize_int):
+    def __init__(self, fontFile_path, pixelSize_int, isBitPixel):
         self.pixelSize_int = pixelSize_int
         self.face = freetype.Face(fontFile_path)
         self.face.set_pixel_sizes(0, pixelSize_int)
         self.hc_file = open('font.h', 'w')
         self.h_file = open(self._getHeaderName(), 'w')
         self.c_file = open(self._getSourceName(), 'w')
-	self.generateCHeaderComm()
+        self.isBitPixel = isBitPixel
+        self.generateCHeaderComm()
         self.generateCHeader()
         self.generateCSource()
 
@@ -75,7 +77,10 @@ class ClangGenerator(object):
                 char = chr(j)
                 char_bmp, buf, w, h, left, top, advance, pitch = self._getChar(char)
                 self._generateLookupEntryForChar(char, offset, w, h, left, top, advance)
-                offset += w * h
+                if (self.isBitPixel == True):
+                    offset += (w/8 + bool(w%8)) * h
+                else:
+                    offset += w * h
             else:
                 self.c_file.write('{}{{0}},\n'.format(TAB_STR))
         self.c_file.write('{}{{0}}\n'.format(TAB_STR))
@@ -111,8 +116,8 @@ class ClangGenerator(object):
         for i in range(ord(FIRST_CHAR), ord(LAST_CHAR) + 1):
             char = chr(i)
             char_bmp, buf, w, h, left, top, advance, pitch = self._getChar(char)
-            if top - h  > tallest:
-                tallest = top - h
+            if top + h  > tallest:
+                tallest = top + h
         return tallest
 
     def _getChar(self, char):
@@ -134,9 +139,18 @@ class ClangGenerator(object):
         return self.face.glyph.bitmap
 
     def _hexLine(self, buf, y, w, pitch):
+        bytes = [0]*w
         for x in range(w):
             v = buf[x + y * pitch]
-            self.c_file.write('0x{:02x},'.format(v))
+            if (self.isBitPixel == True):
+                if v > 127:
+                    bytes[x/8] |= 1<<(x%8)
+            else:
+                self.c_file.write('0x{:02x},'.format(v))
+                
+        if (self.isBitPixel == True):
+            for x in range(w/8 + bool(w%8)):
+                self.c_file.write('0x{:02x},'.format(bytes[x]))
 
     def _asciiArtLine(self, buf, y, w, pitch):
         for x in range(w):

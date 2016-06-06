@@ -23,7 +23,7 @@ void FontPainter_RenderText(gfxSurface_p srf, fontItem_p font, const char *text)
     			srf->line[y + character.top][x + xPos + character.left] = pix<<4 | pix;
 	    	}
 	    }
-	    xPos += character.advance + 1;
+	    xPos += character.advance + character.left + 1;
 	    text++;
 	}
 }
